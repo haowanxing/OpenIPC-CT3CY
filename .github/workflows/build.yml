@@ -71,9 +71,19 @@ jobs:
             echo NANDFW=${NANDFW} >> ${GITHUB_ENV}
           fi
 
+      - name: Upload firmware artifact
+        if: env.NORFW
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{matrix.platform}}
+          path: |
+            ${{env.NORFW}}
+            ${{env.NANDFW}}
+
       - name: Upload firmware
         if: github.event_name != 'pull_request'
         uses: softprops/action-gh-release@v2
+        continue-on-error: true
         with:
           tag_name: ${{env.TAG_NAME}}
           files: |
