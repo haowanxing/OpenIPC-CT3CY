@@ -1,6 +1,8 @@
 #!/bin/sh
-# Set SR_I2C_MODE=1 to route hardware I2C to SR_IO08(SDA)/SR_IO09(SCL)
-# CHIPTOP register 0x06 (phys 0x1F203C0C), bits [5:4]
-CURRENT=$(devmem 0x1F203C0C 16)
-NEW=$(printf '0x%04x' $(( CURRENT | 0x0010 )))
-devmem 0x1F203C0C 16 $NEW
+# Pre-configure sensor PDN and RST GPIOs (SSC325 mhal crashes if done via VIF HAL)
+echo 12 > /sys/class/gpio/export 2>/dev/null
+echo 13 > /sys/class/gpio/export 2>/dev/null
+echo out > /sys/class/gpio/gpio12/direction
+echo out > /sys/class/gpio/gpio13/direction
+echo 0 > /sys/class/gpio/gpio12/value   # PDN=LOW (power on)
+echo 1 > /sys/class/gpio/gpio13/value   # RST=HIGH (released)
